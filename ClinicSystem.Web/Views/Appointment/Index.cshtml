@@ -1,0 +1,299 @@
+﻿@model AppointmentViewModel
+@inject UserManager<ApplicationUser> _userManager
+@inject SignInManager<ApplicationUser> _signInManager
+
+@{
+    ViewData["Title"] = "Appointments";
+}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">Appointments</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-Action="Index"></a>Home</li>
+                        <li class="breadcrumb-item active">Manage Appointments</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Appointments Management</h3>
+                            <div class="card-tools">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-info rounded-pill" data-bs-toggle="modal" data-bs-target="#appointmentModal" onclick="Reset()">
+                                    <i class="fa fa-plus" aria-hidden="true"></i> Add New Appointment
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <table id="example2" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Doctor</td>
+                                        <td>Appointment Date</td>
+                                        <td>Start Time</td>
+                                        <td>Duration</td>
+                                        <td>Patient</td>
+                                        <td>Actions</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Appointments != null && Model.Appointments.Any())
+                                    {
+                                        @foreach (var item in Model.Appointments)
+                                        {
+                                            <tr>
+                                                <td>@string.Concat(item.Doctor.FirstName, " ", item.Doctor.LastName)</td>
+                                                <td>@item.AppointmentDate.ToShortDateString()</td>
+                                                <td>@item.StartTime.ToString("hh\\:mm")</td>
+                                                <td>@item.Duration</td>
+                                                <td>@item.Patient.Name</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-info btn-sm rounded-pill" onclick="Edit('@item.Id')" value="Edit" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                                        Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                    </button>
+                                                    &nbsp;
+                                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="Delete('@item.Id')" value="Delete">
+                                                        Delete <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="bg-warning-subtle p-2 rounded-square rounded-3 my-2" role="alert">
+                                                    <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                                                    <span> No appointments available</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<!-- Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalTitle">Add New Appointment</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentForm" asp-action="SaveAppointment" asp-controller="Appointments" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label asp-for="AppointmentDate" class="control-label">Appointment Date</label>
+                        <input type="date" class="form-control" asp-for="AppointmentDate" />
+                        <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StartTime" class="control-label">Start Time</label>
+                        <input type="time" class="form-control" asp-for="StartTime" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Duration" class="control-label">Duration (minutes)</label>
+                        <input type="number" class="form-control" asp-for="Duration" max="30" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DoctorId" class="control-label">Doctor</label>
+                        <select class="form-control" asp-for="DoctorId" asp-items="Model.Doctors"></select>
+                        <span asp-validation-for="DoctorId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PatientId" class="control-label">Patient</label>
+                        <select class="form-control" asp-for="PatientId" asp-items="Model.Patients"></select>
+                        <span asp-validation-for="PatientId" class="text-danger"></span>
+                    </div>
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    foreach (var error in modelState.Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <div class="modal-footer" style="padding: 0 15px 15px 0;">
+                        <input type="submit" class="btn btn-success rounded-pill" id="btnSave" value="Save changes" />
+                        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables  & Plugins -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/Admin/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/Admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="~/Admin/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="~/Admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="~/Admin/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="~/Admin/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="~/Admin/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+
+<!-- Toastr script -->
+<script src="~/lib/toastr.js/toastr.min.js"></script>
+
+<!-- Datatable Module -->
+<script src="~/modules/datatablemodule.js"></script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            saveAppointment();
+        });
+
+        function saveAppointment() {
+            var appointmentDate = document.getElementById('AppointmentDate').value;
+            var startTime = document.getElementById('StartTime').value;
+            var duration = document.getElementById('Duration').value;
+            var doctorId = document.getElementById('DoctorId').value;
+            var patientId = document.getElementById('PatientId').value;
+
+            if (!appointmentDate || !startTime || !duration || !doctorId || !patientId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'All fields are required!',
+                });
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("SaveAppointment", "Appointment")',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: {
+                    AppointmentDate: appointmentDate,
+                    StartTime: startTime,
+                    Duration: duration,
+                    DoctorId: doctorId,
+                    PatientId: patientId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Appointment saved successfully',
+                            text: 'Redirecting...',
+                            timer: 2000
+                        }).then(function () {
+                            window.location.href = '/Appointment/Index';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'An error occurred while processing your request.',
+                    });
+                }
+            });
+        }
+
+        function Delete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/Appointment/DeleteAppointment?Id=${id}`;
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Your appointment has been deleted.',
+                        icon: 'success',
+                        timer: 2000
+                    });
+                }
+            });
+        }
+
+        function Edit(id) {
+            fetch(`/Appointment/GetAppointment?id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modalTitle').innerText = "Edit Appointment";
+                    document.getElementById('btnSave').value = "Update";
+                    document.getElementById('appointmentForm').action = `/Admin/Appointments/UpdateAppointment?id=${id}`;
+                    document.getElementById('appointmentId').value = data.id;
+                    document.getElementById('appointmentDate').value = data.appointmentDate;
+                    document.getElementById('startTime').value = data.startTime;
+                    document.getElementById('duration').value = data.duration;
+                    document.getElementById('doctorId').value = data.doctorId;
+                    document.getElementById('patientId').value = data.patientId;
+                });
+        }
+
+        function Reset() {
+            document.getElementById('modalTitle').innerText = "Add New Appointment";
+            document.getElementById('btnSave').value = "Save changes";
+            document.getElementById('appointmentForm').action = '@Url.Action("SaveAppointment", "Appointment")';
+            document.getElementById('appointmentId').value = '';
+            document.getElementById('appointmentDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('duration').value = 30;
+            document.getElementById('doctorId').value = '';
+            document.getElementById('patientId').value = '';
+        }
+    </script>
+}
+
+

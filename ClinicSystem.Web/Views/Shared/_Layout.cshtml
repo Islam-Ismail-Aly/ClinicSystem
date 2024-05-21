@@ -187,7 +187,7 @@
                             </ul>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a asp-controller="Doctor" asp-action="Index" class="nav-link">
+                                    <a asp-controller="Doctors" asp-action="Index" class="nav-link">
                                         <i class="fa fa-user-md" aria-hidden="true" style="font-size: 13px;"></i>
                                         &nbsp;
                                         <p> Doctors</p>
@@ -345,6 +345,9 @@
 
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="~/Admin/dist/js/pages/dashboard.js"></script>
+
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false);
 </body>

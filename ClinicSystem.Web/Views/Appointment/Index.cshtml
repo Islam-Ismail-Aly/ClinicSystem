@@ -12,7 +12,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Appointments</h1>
+                    <h1 class="m-0 text-dark">@ViewData["Title"]</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -114,27 +114,27 @@
                     @Html.AntiForgeryToken()
                     <div class="form-group">
                         <label asp-for="AppointmentDate" class="control-label">Appointment Date</label>
-                        <input type="date" class="form-control" asp-for="AppointmentDate" />
+                        <input id="appointmentDate" type="date" class="form-control" asp-for="AppointmentDate" />
                         <span asp-validation-for="AppointmentDate" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="StartTime" class="control-label">Start Time</label>
-                        <input type="time" class="form-control" asp-for="StartTime" />
+                        <input id="startTime" type="time" class="form-control" asp-for="StartTime" />
                         <span asp-validation-for="StartTime" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Duration" class="control-label">Duration (minutes)</label>
-                        <input type="number" class="form-control" asp-for="Duration" max="30" />
+                        <input id="duration" type="number" class="form-control" asp-for="Duration" max="30" />
                         <span asp-validation-for="Duration" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="DoctorId" class="control-label">Doctor</label>
-                        <select class="form-control" asp-for="DoctorId" asp-items="Model.Doctors"></select>
+                        <select id="doctorId" class="form-control" asp-for="DoctorId" asp-items="Model.Doctors"></select>
                         <span asp-validation-for="DoctorId" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="PatientId" class="control-label">Patient</label>
-                        <select class="form-control" asp-for="PatientId" asp-items="Model.Patients"></select>
+                        <select id="patientId" class="form-control" asp-for="PatientId" asp-items="Model.Patients"></select>
                         <span asp-validation-for="PatientId" class="text-danger"></span>
                     </div>
                     @if (!ViewData.ModelState.IsValid)
@@ -272,8 +272,8 @@
                 .then(data => {
                     document.getElementById('modalTitle').innerText = "Edit Appointment";
                     document.getElementById('btnSave').value = "Update";
-                    document.getElementById('appointmentForm').action = `/Admin/Appointments/UpdateAppointment?id=${id}`;
-                    document.getElementById('appointmentId').value = data.id;
+                    document.getElementById('appointmentForm').action = `/Appointment/UpdateAppointment?id=${id}`;
+                    // document.getElementById('appointmentId').value = data.id;
                     document.getElementById('appointmentDate').value = data.appointmentDate;
                     document.getElementById('startTime').value = data.startTime;
                     document.getElementById('duration').value = data.duration;
@@ -286,7 +286,7 @@
             document.getElementById('modalTitle').innerText = "Add New Appointment";
             document.getElementById('btnSave').value = "Save changes";
             document.getElementById('appointmentForm').action = '@Url.Action("SaveAppointment", "Appointment")';
-            document.getElementById('appointmentId').value = '';
+            // document.getElementById('appointmentId').value = '';
             document.getElementById('appointmentDate').value = '';
             document.getElementById('startTime').value = '';
             document.getElementById('duration').value = 30;

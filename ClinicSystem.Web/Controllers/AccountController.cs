@@ -1,13 +1,8 @@
-﻿using ClinicSystem.Core.Entities;
-using ClinicSystem.Core.Interfaces;
-using ClinicSystem.Web.Utilities;
-using ClinicSystem.Web.ViewModels.Account;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
+﻿
 namespace ClinicSystem.Web.Controllers
 {
+    [AllowAnonymous]
+    [AuthenticatedUsersAttribute]
     public class AccountController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -188,23 +183,10 @@ namespace ClinicSystem.Web.Controllers
         //    return RedirectToAction(nameof(Users));
         //}
 
-        //[HttpGet]
-        //public async Task<IActionResult> Profile()
-        //{
-        //    var currentUser = await _userManager.GetUserAsync(User);
-        //    if (currentUser != null)
-        //    {
-        //        var customer = _customerUnitOfWork.UserRepository.GetByUserId(currentUser.Id);
-
-        //        if (customer != null)
-        //        {
-        //            ViewBag.Phone = customer.Phone;
-        //            ViewBag.City = customer.City;
-        //            ViewBag.DateAdded = customer.CreationDate.ToShortDateString();
-        //            ViewBag.Status = customer.Status;
-        //        }
-        //    }
-        //    return View();
-        //}
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            return View();
+        }
     }
 }

@@ -26,9 +26,18 @@ namespace Clinic.Infrastructure.Repository
             return result;
         }
 
+        public async Task<Schedule> GetScheduleByDoctorIdAsync(int id)
+        {
+            var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.DoctorId == id);
+
+            return schedule;
+        }
+
         public void Dispose()
         {
             _userManager.Dispose();
         }
+
+
     }
 }

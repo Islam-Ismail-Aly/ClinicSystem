@@ -1,4 +1,5 @@
-﻿@{
+﻿@model DashboardViewModel
+@{
     ViewData["Title"] = "Admin Page";
 }
 
@@ -30,8 +31,7 @@
                     <!-- small box -->
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3>5</h3>
-
+                            <h3>@Model.DoctorsCount</h3>
                             <p>Doctors</p>
                         </div>
                         <div class="icon">
@@ -44,8 +44,7 @@
                     <!-- small box -->
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>3</h3>
-
+                            <h3>@Model.PatientsCount</h3>
                             <p>Patients</p>
                         </div>
                         <div class="icon">
@@ -58,8 +57,7 @@
                     <!-- small box -->
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>2</h3>
-
+                            <h3>@Model.UsersCount</h3>
                             <p>Users</p>
                         </div>
                         <div class="icon">
@@ -72,8 +70,7 @@
                     <!-- small box -->
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h3>3</h3>
-
+                            <h3>@Model.SecretariesCount</h3>
                             <p>Secretaries</p>
                         </div>
                         <div class="icon">
@@ -84,10 +81,20 @@
                 <!-- ./col -->
             </div>
             <!-- /.row -->
+
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Pie Chart Column -->
+                    <div class="col-sm-6">
+                        <canvas class="my-2" id="countsPieChart" style="max-width: 400px; max-height: 370px; margin: auto;"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Main row -->
             <div class="card">
                 <div class="card-header border-transparent">
-                    <h3 class="card-title">Latest Appointment</h3>
+                    <h3 class="card-title">Latest Appointments</h3>
 
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -99,42 +106,91 @@
                     </div>
                 </div>
                 <!-- /.card-header -->
-                @*                 <div class="card-body p-0">
-                <div class="table-responsive">
-                <table class="table m-0">
-                <thead>
-                <tr>
-                <th>Customer</th>
-                <th>Item</th>
-                <th>Status</th>
-                <th>Date</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var order in Model)
-                {
-                <tr>
-                <td>@order.CustomerName</td>
-                <td>@order.Title</td>
-                <td><span class="badge badge-success"><i class="fa fa-check-circle-o" aria-hidden="true"></i> @order.Status</span></td>
-                <td><span class="badge badge-warning text-white"><i class="fa fa-clock" aria-hidden="true"></i> @order.CreationDate.ToShortDateString()</td>
-                </tr>
-                }
-                </tbody>
-                </table>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table m-0">
+                            <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Patient</th>
+                                    <th>Duration</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var appointment in Model.LatestAppointments)
+                                {
+                                    <tr>
+                                        <td>@string.Concat(appointment.Doctor.FirstName, " ", appointment.Doctor.LastName)</td>
+                                        <td>@appointment.Patient.Name</td>
+                                        <td><span class="badge badge-danger p-2"><i class="fa fa-check-circle-o" aria-hidden="true"></i> @appointment.Duration</span></td>
+                                        <td><span class="badge badge-success text-white p-2"><i class="fa fa-clock" aria-hidden="true"></i> @appointment.AppointmentDate.ToShortDateString()</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
                 </div>
-                <!-- /.table-responsive -->
-                </div> *@
                 <!-- /.card-body -->
                 <div class="card-footer clearfix">
-                    <a asp-action="Appointments" asp-controller="Appointment" class="btn btn-sm btn-info float-left">View All Appointment</a>
+                    <a asp-action="Index" asp-controller="Appointment" class="btn btn-sm btn-info float-left">View All Appointments</a>
                 </div>
                 <!-- /.card-footer -->
             </div>
-
             <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+@section Scripts{
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+          
+            const doctorsCount = @Html.Raw(Json.Serialize(Model.DoctorsCount));
+            const patientsCount = @Html.Raw(Json.Serialize(Model.PatientsCount));
+            const usersCount = @Html.Raw(Json.Serialize(Model.UsersCount));
+            const secretariesCount = @Html.Raw(Json.Serialize(Model.SecretariesCount));
+
+            const data = {
+                labels: ['Doctors', 'Patients', 'Users', 'Secretaries'],
+                datasets: [{
+                    label: 'Clinic Counts',
+                    data: [doctorsCount, patientsCount, usersCount, secretariesCount],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)', // blue
+                        'rgba(255, 206, 86, 0.6)', // yellow
+                        'rgba(75, 192, 192, 0.6)', // green
+                        'rgba(255, 99, 132, 0.6)'  // red
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            var ctx = document.getElementById('countsPieChart').getContext('2d');
+            var countsPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                    }
+                }
+            });
+        });
+
+</script>
+}
+
+

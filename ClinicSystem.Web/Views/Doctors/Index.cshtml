@@ -1,0 +1,97 @@
+﻿@model DoctorAppointmentsViewModel
+
+@{
+    ViewData["Title"] = "Doctor's Appointments";
+}
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <h1>@ViewData["Title"]</h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header border-transparent">
+                        <h3 class="card-title">Doctor's Working Hours</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                            @if(Model != null && Model.CustomText != null)
+                            {
+                                <div class="alert alert-info p-2">
+                                        @Model.CustomText
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning mt-4" role="alert">
+                                    No schedule found.
+                                </div>
+                            }
+                        
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Appointments" method="get" class="form-inline">
+                            <input type="hidden" name="doctorId" value="3" />
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="startDate" class="sr-only">Start Date:</label>
+                                <input class="form-control" type="date" name="startDate" id="startDate" />
+                            </div>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="endDate" class="sr-only">End Date:</label>
+                                <input class="form-control" type="date" name="endDate" id="endDate" />
+                            </div>
+                            <button class="btn btn-primary mb-2" type="submit">Filter</button>
+                        </form>
+                        @if (Model != null && Model.Appointments != null && Model.Appointments.Any())
+                        {
+                            <table class="table table-bordered table-hover mt-4">
+                                <thead>
+                                    <tr>
+                                        <th>Appointment Date</th>
+                                        <th>Start Time</th>
+                                        <th>Duration</th>
+                                        <th>Patient</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Appointments)
+                                    {
+                                        <tr>
+                                            <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.StartTime.ToString(@"hh\:mm")</td>
+                                            <td>@item.Duration</td>
+                                            <td>@item.Patient?.Name</td>
+                                            <td>
+                                                <button type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id')">Edit</button>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="Delete('@item.Id')">Delete</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mt-4" role="alert">
+                                No appointments found.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

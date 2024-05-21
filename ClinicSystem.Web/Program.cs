@@ -3,6 +3,8 @@ using Clinic.Infrastructure.UnitOfWork;
 using ClinicSystem.Core.Entities;
 using ClinicSystem.Core.Interfaces;
 using ClinicSystem.Infrastructure.Data;
+using ClinicSystem.Infrastructure.Repository;
+using ClinicSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +42,10 @@ namespace ClinicSystem.Web
             builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped(typeof(ICommonRepository<>), typeof(CommonRepository<>));
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 
             var app = builder.Build();
 

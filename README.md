@@ -30,6 +30,33 @@
 - **Database**: SQL Server
 - **Architecture**: N-Tier Architecture, Code First Approach
 
+## Project Structure
+
+```plaintext
+ClinicSystem/
+├── src/
+│   ├── Core/
+│   │   └── ClinicSystem.Core/
+│   │       ├── DTOs
+│   │       ├── Entities
+│   │       ├── Interfaces
+│   │       ├── Utilities
+│   │       └── ...
+│   ├── Infrastructure/
+│   │   └── ClinicSystem.Infrastructure/
+│   │       ├── Data
+│   │       ├── Migrations
+│   │       ├── Repositories
+│   │       └── UnitOfWork
+|   |       └── Services
+│   ├── Web/
+│   │   └── ClinicSystem.Web/
+│   │       ├── wwwroot
+│   │       ├── Controllers
+│   │       ├── Views
+│   │       └── ViewModels
+│   │       └── Utilities
+
 ## Screen of Project
 
 ![WhatsApp Image 2024-05-21 at 13 59 49_e9a298e2](https://github.com/Islam-Ismail-Aly/ClinicSystem/assets/23121933/ff0fe78f-7f1d-446f-8d0f-31fa7ed0aa2e)
